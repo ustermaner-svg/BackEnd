@@ -9,7 +9,9 @@ app.use(express.json()); // this tells the code to be ready to handle json
 app.get("/", (req, res) => {
     res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
 });
-
+app.get("/version", (req,res)=>{
+    res.send("Version 1.3 BACKEND");
+});
 // Age + Gender endpoint
 app.post("/getAgeGender", async (req, res) => {
     const { name } = req.body;
@@ -37,4 +39,5 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
