@@ -22,7 +22,7 @@ app.post("/getAgeGender", async (req, res) => {
         const ageResponse = {data: 1}; //await axios.get(`https://api.agify.io?name=${name}`);
         console.log("Age OK:", ageResponse.data);
         console.log("Fetching gender...");
-        const genderResponse = await axios.get(`https://api.genderize.io?name=${name}`);
+        const genderResponse = {data: 4};// await axios.get(`https://api.genderize.io?name=${name}`);
         console.log("Gender OK:", genderResponse.data);
         console.log("Fetching Unsplash...");
         const imageResponse = await axios.get(
@@ -51,6 +51,7 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
 
