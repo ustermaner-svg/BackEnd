@@ -1,62 +1,58 @@
-const express = require("express"); // this is like #include in c++
-const axios = require("axios"); // this is like #include in c++
-const app = express(); //this is like creating an object of the class express in js
-const cors = require("cors"); // this is like #include in c++
-app.use(cors()); // this is like #include in c++
-app.use(express.json()); // this tells the code to be ready to handle json
-const VERSION = "1.8";
+const express = require("express");
+const axios = require("axios");
+const app = express();
+const cors = require("cors");
+app.use(cors());
+app.use(express.json());
+
+const VERSION = "1.9";
+const UNSPLASH_ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
+
 // Root endpoint
-app.get("/", (req, res) => {
-    res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
-});
-app.get("/version", (req,res)=>{
-    res.send("Version "+VERSION+" BACKEND");
-});
-const ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
-// Age + Gender endpoint
+app.get("/", (req, res) => res.send("Hello from Node.js backend!"));
+app.get("/version", (req, res) => res.send("Version " + VERSION + " BACKEND"));
+
+// Age + Gender + Unsplash endpoint
 app.post("/getAgeGender", async (req, res) => {
     console.log("REQUEST BODY:", req.body);
     const { name, query } = req.body;
+
+    let age, gender, probability, imageUrl = null;
+
     try {
-        console.log("Fetching age...");
-        const ageResponse = await axios.get(`https://api.agify.io?name=${name}`);
-        console.log("Age OK:", ageResponse.data);
-        console.log("Fetching gender...");
-        const genderResponse = await axios.get(`https://api.genderize.io?name=${name}`);
-        console.log("Gender OK:", genderResponse.data);
-        console.log("Fetching Unsplash...");
-        const imageResponse = await axios.get(
-            `https://api.unsplash.com/photos/random?query=${query}`,
-            { headers: { Authorization: `Client-ID ${ACCESS_KEY}` } }
-        );
-        console.log("Unsplash OK");
-        const result = {
-            name,
-            age: ageResponse.data.age,
-            gender: genderResponse.data.gender,
-            probability: genderResponse.data.probability,
-            url: imageResponse.data?.urls?.small || null
-        };
-        console.log("RESULT:", result);
-        res.json(result);
-    } catch (error) {
-        console.error("ERROR STACK:", error.response?.data || error.message);
-        res.status(500).json({
-            error: "Backend failed",
-            details: error.response?.data || error.message
-        });
+        // Fetch age
+        const ageResp = await axios.get(`https://api.agify.io?name=${name}`);
+        age = ageResp.data.age;
+
+        // Fetch gender
+        const genderResp = await axios.get(`https://api.genderize.io?name=${name}`);
+        gender = genderResp.data.gender;
+        probability = genderResp.data.probability;
+
+    } catch (err) {
+        console.warn("Agify/Genderize failed or limit reached:", err.response?.data || err.message);
     }
+
+    try {
+        // Fetch Unsplash image
+        const imgResp = await axios.get(
+            `https://api.unsplash.com/photos/random?query=${query}`,
+            { headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` } }
+        );
+        imageUrl = imgResp.data?.urls?.small || null;
+    } catch (err) {
+        console.warn("Unsplash failed or no photo found:", err.response?.data || err.message);
+        imageUrl = null; // If Unsplash fails, just return null
+    }
+
+    const result = { name, age, gender, probability, url: imageUrl };
+
+    // If both Agify and Genderize failed completely
+    if (age === undefined && gender === undefined) {
+        return res.status(502).json({ error: "Agify/Genderize APIs failed or limit reached", result });
+    }
+
+    res.json(result);
 });
 
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
-});
-
-
-
-
-
-
-
-
-
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
