@@ -45,8 +45,9 @@ app.post("/getAgeGender", async (req, res) => {
         console.warn("Agify/Genderize failed or limit reached:", err.response?.data || err.message);
         // Don't return early — still return Unsplash image
     }
-
-    const result = { name, age, gender, probability, url: imageUrl };
+    const agOK = (age !==null)&&(age !== undefined);
+    const gnOK = (gender!==null)&&(gender!==undefined)&&(probability!==null)&&(probability!==undefined);
+    const result = { name, age, gender, probability, url: imageUrl, agOK, gnOK};
 
     res.json(result); // Always include the image URL, even if age/gender are missing
 });
