@@ -10,41 +10,48 @@ app.get("/", (req, res) => {
     res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
 });
 app.get("/version", (req,res)=>{
-    res.send("Version 1.6 BACKEND");
+    res.send("Version 1.7 BACKEND");
 });
 const ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
 // Age + Gender endpoint
 app.post("/getAgeGender", async (req, res) => {
-    const { name } = req.body;
-    const {query} = req.body;
+    console.log("REQUEST BODY:", req.body);
+    const { name, query } = req.body;
     try {
+        console.log("Fetching age...");
         const ageResponse = await axios.get(`https://api.agify.io?name=${name}`);
+        console.log("Age OK:", ageResponse.data);
+        console.log("Fetching gender...");
         const genderResponse = await axios.get(`https://api.genderize.io?name=${name}`);
-        const response = await axios.get(`https://api.unsplash.com/photos/random?query=${query}`, {
-            headers: { Authorization: `Client-ID ${ACCESS_KEY}` }
-        });
+        console.log("Gender OK:", genderResponse.data);
+        console.log("Fetching Unsplash...");
+        const imageResponse = await axios.get(
+            `https://api.unsplash.com/photos/random?query=${query}`,
+            { headers: { Authorization: `Client-ID ${ACCESS_KEY}` } }
+        );
+        console.log("Unsplash OK");
         const result = {
-            name, 
+            name,
             age: ageResponse.data.age,
             gender: genderResponse.data.gender,
             probability: genderResponse.data.probability,
-            url: response.data.urls.small
+            url: imageResponse.data?.urls?.small || null
         };
-        if (result.age === undefined || result.gender === undefined || result.probability === undefined) {
-            return res.status(502).json({ error: "External API failed or limit reached" });
-        };
+        console.log("RESULT:", result);
         res.json(result);
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Backend request failed" });
-        console.error(error);
-        console.log(error);// If there's an error, send a 500 status code with an error message
+    } catch (error) {
+        console.error("ERROR STACK:", error.response?.data || error.message);
+        res.status(500).json({
+            error: "Backend failed",
+            details: error.response?.data || error.message
+        });
     }
 });
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
 
