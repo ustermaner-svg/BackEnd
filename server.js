@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
     res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
 });
 app.get("/version", (req,res)=>{
-    res.send("Version 1.4 BACKEND");
+    res.send("Version 1.6 BACKEND");
 });
 const ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
 // Age + Gender endpoint
@@ -30,12 +30,13 @@ app.post("/getAgeGender", async (req, res) => {
             probability: genderResponse.data.probability,
             url: response.data.urls.small
         };
-        if (result.age === undefined && result.gender === undefined && result.probability === undefined) {
+        if (result.age === undefined || result.gender === undefined || result.probability === undefined) {
             return res.status(502).json({ error: "External API failed or limit reached" });
         };
         res.json(result);
     }
     catch (error) {
+        return res.status(500).json({ error: "Backend request failed" });
         console.error(error);
         console.log(error);// If there's an error, send a 500 status code with an error message
     }
@@ -44,6 +45,7 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
 
