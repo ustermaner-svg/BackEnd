@@ -10,20 +10,25 @@ app.get("/", (req, res) => {
     res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
 });
 app.get("/version", (req,res)=>{
-    res.send("Version 1.3 BACKEND");
+    res.send("Version 1.4 BACKEND");
 });
+const ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
 // Age + Gender endpoint
 app.post("/getAgeGender", async (req, res) => {
     const { name } = req.body;
+    const {query} = req.body;
     try {
         const ageResponse = await axios.get(`https://api.agify.io?name=${name}`);
         const genderResponse = await axios.get(`https://api.genderize.io?name=${name}`);
-
+        const response = await axios.get(`https://api.unsplash.com/photos/random?query=${query}`, {
+            headers: { Authorization: `Client-ID ${ACCESS_KEY}` }
+        });
         const result = {
             name, 
             age: ageResponse.data.age,
             gender: genderResponse.data.gender,
-            probability: genderResponse.data.probability
+            probability: genderResponse.data.probability,
+            url: response.data.urls.small
         };
         if (result.age === undefined || result.gender === undefined || result.probability === undefined) {
             return res.status(502).json({ error: "External API failed or limit reached" });
@@ -39,5 +44,6 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
