@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
     res.send("Hello from Node.js backend!"); // confirmation that the server is running and can respond to requests
 });
 app.get("/version", (req,res)=>{
-    res.send("Version 1.7 BACKEND");
+    res.send("Version TESTING BACKEND");
 });
 const ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
 // Age + Gender endpoint
@@ -19,7 +19,7 @@ app.post("/getAgeGender", async (req, res) => {
     const { name, query } = req.body;
     try {
         console.log("Fetching age...");
-        const ageResponse = await axios.get(`https://api.agify.io?name=${name}`);
+        const ageResponse = {data: 1}; //await axios.get(`https://api.agify.io?name=${name}`);
         console.log("Age OK:", ageResponse.data);
         console.log("Fetching gender...");
         const genderResponse = await axios.get(`https://api.genderize.io?name=${name}`);
@@ -51,6 +51,7 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
 
