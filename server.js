@@ -30,7 +30,7 @@ app.post("/getAgeGender", async (req, res) => {
             probability: genderResponse.data.probability,
             url: response.data.urls.small
         };
-        if (result.age === undefined || result.gender === undefined || result.probability === undefined) {
+        if (result.age === undefined && result.gender === undefined && result.probability === undefined) {
             return res.status(502).json({ error: "External API failed or limit reached" });
         };
         res.json(result);
@@ -44,6 +44,7 @@ app.post("/getAgeGender", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
+
 
 
 
