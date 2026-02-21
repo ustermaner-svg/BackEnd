@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.json());
 const fs = require("fs");
 const path = require("path");
-const VERSION = "1.10";
+const VERSION = "1.20";
 const UNSPLASH_ACCESS_KEY = 'VT9QiRxg_zkaEx5z2PAO3tAJ-2XSwLgdGapDJ9orNo8';
 
 app.get("/", (req, res) => res.send("Hello from Node.js backend!"));
@@ -74,4 +74,5 @@ app.post("/getAgeGender", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+
 
